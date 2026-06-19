@@ -1,0 +1,65 @@
+<!-- DM Page: Private Message dengan satu user -->
+<div id="app-data"
+    data-user-id="{{ currentUser._id }}"
+    data-username="{{ currentUser.username }}"
+    data-recipient-id="{{ recipient._id }}"
+    data-recipient-name="{{ recipient.username }}"
+    style="display:none;">
+</div>
+
+<div class="d-flex flex-column" style="height: calc(100vh - 56px);">
+
+    <!-- Header -->
+    <div class="p-3 border-bottom d-flex align-items-center gap-3"
+        style="background:#16213e; border-color:#0f3460 !important;">
+        <a href="/chat" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <span class="badge-dot {{#if recipient.isOnline}}online{{else}}offline{{/if}}"
+              style="width:10px;height:10px;border-radius:50%;display:inline-block;
+                     background:{{#if recipient.isOnline}}#28a745{{else}}#6c757d{{/if}};">
+        </span>
+        <strong>{{ recipient.username }}</strong>
+        <span class="text-muted small">{{#if recipient.isOnline}}Online{{else}}Offline{{/if}}</span>
+    </div>
+
+    <!-- Messages History (dari server render) -->
+    <div id="messages" class="flex-grow-1 p-4 overflow-auto" style="background:#1a1a2e;">
+        {{#each messages}}
+        <div class="d-flex mb-3 {{#if (isOwn this.sender._id)}}justify-content-end{{/if}}">
+            <div class="msg-bubble p-3 {{#if (isOwn this.sender._id)}}mine{{else}}other{{/if}}">
+                {{#unless (isOwn this.sender._id)}}
+                <div class="small fw-bold mb-1" style="color:#e94560;">{{ this.sender.username }}</div>
+                {{/unless}}
+                <div>{{ this.content }}</div>
+                <div class="text-muted small mt-1">{{ this.createdAt }}</div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- Typing -->
+    <div id="typing-indicator" class="px-4 py-1 text-muted small" style="min-height:24px;"></div>
+
+    <!-- Input -->
+    <div class="p-3 border-top" style="background:#16213e; border-color:#0f3460 !important;">
+        <form id="dm-form" class="d-flex gap-2">
+            <input type="text" id="message-input"
+                class="form-control bg-dark text-light border-secondary"
+                placeholder="Kirim pesan ke {{ recipient.username }}..."
+                autocomplete="off">
+            <button type="submit" class="btn px-4" style="background:#e94560; color:white;">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .msg-bubble { max-width:70%; }
+    .msg-bubble.mine  { background:#0f3460; border-radius:12px 12px 0 12px; }
+    .msg-bubble.other { background:#16213e; border-radius:12px 12px 12px 0; }
+</style>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/dm.js"></script>
