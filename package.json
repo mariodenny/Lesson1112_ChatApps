@@ -1,0 +1,19 @@
+{
+  "name": "lesson11-12-chatapps",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --watch app.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-mongo": "^6.0.0",
+    "express": "^5.2.1",
+    "express-handlebars": "^8.0.3",
+    "express-session": "^1.19.0",
+    "handlebars": "^4.7.9",
+    "mongoose": "^9.7.0",
+    "socket.io": "^4.8.3"
+  }
+}
