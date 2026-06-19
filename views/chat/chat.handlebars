@@ -1,0 +1,114 @@
+<!-- 
+    DATA yang di-pass dari ChatController:
+    - users       → semua user (untuk sidebar)
+    - currentRoom → nama room aktif
+    - currentUser → dari res.locals (session)
+-->
+
+<!-- Simpan data untuk dipakai di chat.js -->
+<div id="app-data"
+    data-user-id="{{ currentUser._id }}"
+    data-username="{{ currentUser.username }}"
+    data-room="{{ currentRoom }}"
+    style="display:none;">
+</div>
+
+<!-- ===================== LAYOUT ===================== -->
+<div class="d-flex" style="height: calc(100vh - 56px);">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="d-flex flex-column p-0" style="width:260px; background:#16213e; border-right:1px solid #0f3460; overflow-y:auto;">
+
+        <!-- ROOMS -->
+        <div class="p-3 border-bottom" style="border-color:#0f3460 !important;">
+            <div class="text-muted small text-uppercase fw-bold mb-2">💬 Rooms</div>
+            <a href="/chat?room=general" class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none mb-1
+                {{#if (isActive currentRoom 'general')}}active-room{{/if}}"
+                style="color:#c0c0d0; background: {{#if (isActive currentRoom 'general')}}#0f3460{{/if}}">
+                # general
+            </a>
+            <a href="/chat?room=random" class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none mb-1"
+                style="color:#c0c0d0;">
+                # random
+            </a>
+            <a href="/chat?room=dev" class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none"
+                style="color:#c0c0d0;">
+                # dev
+            </a>
+        </div>
+
+        <!-- ONLINE USERS -->
+        <div class="p-3">
+            <div class="text-muted small text-uppercase fw-bold mb-2">👥 Users Online</div>
+            <!-- Diisi dinamis oleh socket event 'online-users' -->
+            <div id="online-users-list"></div>
+
+            <hr style="border-color:#0f3460;">
+            <div class="text-muted small text-uppercase fw-bold mb-2">👤 Semua User</div>
+            {{#each users}}
+            <a href="/chat/dm/{{ this._id }}" class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none mb-1"
+                style="color:#c0c0d0;">
+                <span class="badge-dot {{#if this.isOnline}}online{{else}}offline{{/if}}"></span>
+                {{ this.username }}
+            </a>
+            {{/each}}
+        </div>
+    </div>
+
+    <!-- ── CHAT AREA ── -->
+    <div class="d-flex flex-column flex-grow-1">
+
+        <!-- Header -->
+        <div class="p-3 border-bottom d-flex align-items-center gap-2"
+            style="background:#16213e; border-color:#0f3460 !important;">
+            <span style="color:#e94560; font-size:1.2rem;">#</span>
+            <strong id="room-name">{{ currentRoom }}</strong>
+        </div>
+
+        <!-- Messages -->
+        <div id="messages" class="flex-grow-1 p-4 overflow-auto" style="background:#1a1a2e;">
+            <!-- Diisi oleh socket event 'room-history' dan 'new-message' -->
+        </div>
+
+        <!-- Typing indicator -->
+        <div id="typing-indicator" class="px-4 py-1 text-muted small" style="min-height:24px;"></div>
+
+        <!-- Input box -->
+        <div class="p-3 border-top" style="background:#16213e; border-color:#0f3460 !important;">
+            <form id="chat-form" class="d-flex gap-2">
+                <input type="text" id="message-input"
+                    class="form-control bg-dark text-light border-secondary"
+                    placeholder="Ketik pesan... (Enter untuk kirim)"
+                    autocomplete="off">
+                <button type="submit" class="btn px-4" style="background:#e94560; color:white;">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── NOTIFICATION TOAST ── -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999;">
+        <div id="notif-toast" class="toast align-items-center text-white border-0"
+            style="background:#e94560;" role="alert">
+            <div class="d-flex">
+                <div class="toast-body" id="notif-body">Pesan baru!</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .badge-dot.online  { background:#28a745; }
+    .badge-dot.offline { background:#6c757d; }
+    .msg-bubble { max-width:70%; }
+    .msg-bubble.mine { background:#0f3460; border-radius:12px 12px 0 12px; }
+    .msg-bubble.other { background:#16213e; border-radius:12px 12px 12px 0; }
+    .msg-system { color:#6c757d; font-size:.85rem; font-style:italic; }
+</style>
+
+<!-- Socket.IO client (dari server) -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js"></script>
