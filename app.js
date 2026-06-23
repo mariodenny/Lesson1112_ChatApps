@@ -27,7 +27,7 @@ const sessionMiddleware = session({
 })
 
 import AuthRoutes from './routes/AuthRoutes.js'
-
+import ChatRoutes from './routes/ChatRoutes.js'
 
 app.engine('handlebars', engine({
     helpers:{
@@ -53,6 +53,7 @@ io.use((socket,next)=>{
 })
 
 app.use("/auth", AuthRoutes)
+app.use("/chat", ChatRoutes)
 
 app.get("/", (req,res)=>{
     res.render("index")
